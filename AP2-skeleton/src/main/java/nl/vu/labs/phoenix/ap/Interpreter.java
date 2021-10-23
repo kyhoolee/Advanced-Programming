@@ -60,12 +60,12 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 	}
 
 	private T statement(Scanner statementScanner) throws APException {
-		
+
 		System.out.println("statement");
-		
+
 		ignoreInput(statementScanner, SPACE);
-		
-		if (nextCharIsLetter(statementScanner)) { // identifier starts with letter
+
+		if (nextCharIsLetter(statementScanner)) { 
 			return assignment(statementScanner);
 		} else if (nextCharIs(statementScanner, '?')) {
 			nextChar(statementScanner);
@@ -82,28 +82,22 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		// assign an expression to an identifier
 		// expression should be evaluated and return a set
 		// parse id
-		//check =
-		//parse expression
-		
-		System.out.println("assign");
-		T set = null;
-		Identifier identifier = new Identifier();
-		StringBuffer help = new StringBuffer();
-		
-		ignoreInput(assignmentScanner, SPACE);
-		
-		while (assignmentScanner.hasNext()) {
-			if (nextCharIsLetter(assignmentScanner) || nextCharIsDigit(assignmentScanner)) {
-				identifier.add(nextChar(assignmentScanner));
-				continue;
-			} else if (nextCharIs(assignmentScanner,'=') || nextCharIs(assignmentScanner,' ')) {
-				break;
-			} else throw new APException ("lol wrong id");
-		
-		}
-		nextChar(assignmentScanner);
-		set = expression(assignmentScanner);
+		// check =
+		// parse expression
 
+		System.out.println("assignment");
+		T set = null;
+		Identifier identifier = null;
+		StringBuffer help = new StringBuffer();
+
+		ignoreInput(assignmentScanner, SPACE);
+
+		while (assignmentScanner.hasNext()) {
+			identifier = identifier(assignmentScanner);
+			System.out.println(identifier.value());
+			nextChar(assignmentScanner);
+			set = expression(assignmentScanner);
+		}	
 		map.put(identifier, set);
 
 		System.out.println("done assing");
@@ -135,17 +129,17 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		result.init(nextChar(identifierScanner));
 
 		while (identifierScanner.hasNext()) {
-			if (nextCharIsLetter(identifierScanner) || nextCharIsDigit(identifierScanner)) { // if there is space return false
-				result.add(nextChar(identifierScanner));
-			}
-			ignoreInput(identifierScanner,SPACE);
-
 			if (nextCharIsLetter(identifierScanner) || nextCharIsDigit(identifierScanner)) {
+				result.add(nextChar(identifierScanner));
+				continue;
+			} else  {
+				while (nextCharIs(identifierScanner,' ')) {
+					nextChar(identifierScanner);
+				}
 				if (nextCharIs(identifierScanner,'=')) {
-					return result;
-				} else throw new APException("Invalid Identifier. Identifier must start with a letter and contain only letters or natural numbers.\n");
-
-			} else break;
+					break;
+				} else throw new APException ("Invalid Identifier. Identifier must start with a letter and contain only letters or natural numbers.");
+			}
 		}
 		System.out.println(result.value());
 
@@ -160,23 +154,24 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		 * | symdiff
 		 */
 
-		System.out.println("1");
+		System.out.println("expression");
 
+		ignoreInput(expressionScanner, SPACE);
+		
 		T result = term(expressionScanner);
 
-		//ignoreInput(expressionScanner, SPACE);
+		ignoreInput(expressionScanner, SPACE);
 
 		while (expressionScanner.hasNext()) {
-			ignoreInput(expressionScanner, SPACE);
 			if (nextCharIs(expressionScanner, '+') || nextCharIs(expressionScanner, '-') || nextCharIs(expressionScanner, '|')) {
 				char operator = nextChar(expressionScanner);
-				result = calculate(result, expression (new Scanner (expressionScanner.nextLine())), operator);
+				result = calculate(result, expression (expressionScanner), operator);
 			} else {
 				throw new APException ("No operator detected\n");
 			}
 		}
 
-		System.out.println("2");
+		System.out.println("done expression");
 
 		return result;
 	}
@@ -199,16 +194,24 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		 * calculate term from left to right
 		 * *: intersection
 		 */
+
+		System.out.println("term");
+
+		ignoreInput(termScanner, SPACE);
+		
 		T result = factor(termScanner);
 
+		ignoreInput(termScanner, SPACE);
+		
 		while (termScanner.hasNext()) {
-			ignoreInput(termScanner, SPACE);
 			if (nextCharIs(termScanner, '*')) {
 				result = (T) result.intersection(term(termScanner));
 			} else {
-				throw new APException ("No operator detected\n");
+				throw new APException ("No operator detected");
 			}
 		}
+
+		System.out.println("done term");
 
 		return result;
 	}
@@ -221,13 +224,11 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		APException is thrown .
 		 */
 		T result;
+		
+		System.out.println("factor");
 
 		ignoreInput(factorScanner,SPACE);
-
-		System.out.println("this is factor");
-
-		ignoreInput(factorScanner,SPACE);
-
+		
 		if (nextCharIsLetter (factorScanner)) {
 			Identifier id = identifier(factorScanner); //read an identifier
 
@@ -248,6 +249,9 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		else {
 			throw new APException ("Invalid input. Factor syntax is wrong.\n");
 		}
+
+		System.out.println("done factor");
+
 		return result;
 	}
 
@@ -281,13 +285,14 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 	}
 
 	private T set (Scanner setScanner) throws APException { // setinterface<BigInt> obj when read set, cast to T when return 
+		
+		System.out.println("set");
+		
 		T result;
-
+		
 		nextChar(setScanner);
 
-		if (nextCharIs(setScanner, ',')) {
-			throw new APException("Number missing in set");
-		}
+		ignoreInput(setScanner, SPACE);
 
 		// read set
 		result = naturalNumberRow(setScanner);
@@ -302,15 +307,19 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		if (setScanner.hasNext()) {
 			throw new APException ("No elements allowed after '}'\n");
 		}
+		
+		System.out.println("done set");
+		
 		return result;
 	}	
 
 	private T naturalNumberRow(Scanner rowScanner) throws APException {
 		SetInterface<BigInteger> result = new Set<BigInteger>();
 		result.init();
-
 		StringBuffer bigInt = new StringBuffer();
-
+		
+		System.out.println("number row");
+		
 		while (!nextCharIs(rowScanner,'}')) {
 			ignoreInput(rowScanner, SPACE);
 
@@ -321,6 +330,10 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 			/* corner case: {1,2,3,,5}
 			 * need to check this and give exception
 			 */
+			
+			if (!nextCharIsDigit(rowScanner) && nextCharIs(rowScanner,',')) {
+				 throw new APException ("Missing number in set");
+			}
 
 			// negative number must have a '-' -> check this 
 
@@ -333,21 +346,20 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 				if (!nextCharIs(rowScanner,',')) {
 					if (nextCharIsDigit(rowScanner)) {
 						bigInt.append(nextChar(rowScanner));
+						continue;
 					} else throw new APException ("Invalid number in Set. Set can only consist of natural numbers \n");
 				} else if (nextCharIs(rowScanner,',')) {
 					BigInteger num = new BigInteger(bigInt.toString());
 					result.add(num);
 					bigInt.setLength(0);
-					continue;
 				}
 			}
-
-			BigInteger num = new BigInteger(bigInt.toString());
-			result.add(num);
-
+			
 			ignoreInput(rowScanner, SPACE);
 		}
 
+		System.out.println("done number row");
+		
 		return (T) result;
 	}
 
