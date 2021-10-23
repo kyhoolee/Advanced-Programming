@@ -92,6 +92,7 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		} else {
 			throw new APException ("Invalid input\n");
 		}
+		
 	}
 
 	private T assignment (Scanner assignmentScanner) throws APException { // char by char
@@ -121,6 +122,7 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 
 		LOG_LEVEL --;
 		log("done assign");
+
 		return null;
 	}
 
@@ -335,7 +337,7 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		APException is thrown .
 
 		this method will employ recursive descent it will then call the method expression() 
-		and inside expression,term() factor() and possibly complexFactor ís called again.
+		and inside expression,term() factor() and possibly complexFactor ï¿½s called again.
 		 */
 
 		/* Corner case: complex factor looks like this () 
