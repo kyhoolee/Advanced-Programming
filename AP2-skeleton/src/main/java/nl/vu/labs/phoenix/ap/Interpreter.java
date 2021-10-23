@@ -9,6 +9,14 @@ import java.util.regex.Pattern;
  * A set interpreter for sets of elements of type T
  */
 public class Interpreter<T extends SetInterface<BigInteger>> implements InterpreterInterface<T> {
+	static int LOG_LEVEL = 0;
+	static void log(String msg) {
+		String tab = "";
+		for(int i = 0; i < LOG_LEVEL ; i ++) {
+			tab += "  ";
+		}
+		System.out.println(tab + msg);
+	}
 
 	private HashMap<Identifier, T> map;
 	private static final char SPACE = ' ';
@@ -61,7 +69,8 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 
 	private T statement(Scanner statementScanner) throws APException {
 
-		System.out.println("statement");
+		log("statement");
+		LOG_LEVEL ++;
 
 		ignoreInput(statementScanner, SPACE);
 
@@ -76,6 +85,7 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		} else {
 			throw new APException ("Invalid input\n");
 		}
+		
 	}
 
 	private T assignment (Scanner assignmentScanner) throws APException { // char by char
@@ -85,7 +95,9 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		// check =
 		// parse expression
 
-		System.out.println("assignment");
+		log("assignment");
+		LOG_LEVEL ++;
+		
 		T set = null;
 		Identifier identifier = null;
 		StringBuffer help = new StringBuffer();
@@ -93,14 +105,18 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		ignoreInput(assignmentScanner, SPACE);
 
 		while (assignmentScanner.hasNext()) {
+			// 1. Get identifier 
 			identifier = identifier(assignmentScanner);
-			System.out.println(identifier.value());
+			log("Identifier: " + identifier.value());
+			// 2. Pass = character
 			nextChar(assignmentScanner);
+			// 3. Get expression value
 			set = expression(assignmentScanner);
 		}	
 		map.put(identifier, set);
 
-		System.out.println("done assing");
+		LOG_LEVEL --;
+		log("done assing");
 		return null;
 	}
 
@@ -263,7 +279,7 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		APException is thrown .
 
 		this method will employ recursive descent it will then call the method expression() 
-		and inside expression,term() factor() and possibly complexFactor ís called again.
+		and inside expression,term() factor() and possibly complexFactor ï¿½s called again.
 		 */
 
 		T result = null;
