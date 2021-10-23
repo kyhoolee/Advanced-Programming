@@ -67,7 +67,7 @@ public class LinkedList<E extends Comparable<E>> implements ListInterface<E> {
 		
 		numberOfElements ++;
 		
-		System.out.println(numberOfElements);
+		//System.out.println(numberOfElements);
 		return this;
 	}
 
@@ -140,19 +140,6 @@ public class LinkedList<E extends Comparable<E>> implements ListInterface<E> {
 		
 		return this;
 	}
-
-	/*  @postcondition
-	 *    TRUE: The list contains the element d.
-	 *      current-POST points to the first element in list that contains the element d.
-	 *    FALSE: list does not contain the element d.
-	 *    current-POST points to:
-	 *      - if list-POST is empty
-	 *          null
-	 *      - if the first element in list > d:
-	 *          the first element in list
-	 *        else
-	 *          the last element in list with value < d
-	 **/
 
 	@Override
 	public boolean find(E d) {
