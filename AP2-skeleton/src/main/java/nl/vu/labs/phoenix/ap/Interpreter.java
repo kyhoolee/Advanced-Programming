@@ -103,7 +103,6 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 
 		T set = null;
 		Identifier identifier = null;
-		StringBuffer help = new StringBuffer();
 
 		ignoreInput(assignmentScanner, SPACE);
 
@@ -115,7 +114,7 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 			nextChar(assignmentScanner);
 			// 3. Get expression value
 			set = expression(assignmentScanner);
-			//log("expression: " + setValue(set));
+			log("expression: " + setValue(set));
 		}	
 		map.put(identifier, set);
 
@@ -417,34 +416,39 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 			if (!rowScanner.hasNext()) {
 				throw new APException (String.format("Missing %c\n", '}'));
 			}
-
 			/* corner case: {1,2,3,,5}
 			 * need to check this and give exception
 			 */
 
 			// negative number must have a '-' -> check this 
-			ignoreInput(rowScanner, SPACE);
+
 
 			// 2. Read contents of the set
-			while(rowScanner.hasNext() && !nextCharIs(rowScanner,'}')) {
-				ignoreInput(rowScanner, SPACE);
-				// 2.1 Read Big Integer
-				if (nextCharIs(rowScanner, ',')) {
-					nextChar(rowScanner);
-				}
-				while (rowScanner.hasNext(" ")) {
-					nextChar(rowScanner);
-				}
-				
-				result.add(new BigInteger(naturalNumber(rowScanner)));
 
-				ignoreInput(rowScanner, SPACE);
+			ignoreInput(rowScanner, SPACE);
+			// 2.1 Read Big Integer
+			if (nextCharIs(rowScanner, ',')) {
+				nextChar(rowScanner);
+				if(nextCharIs(rowScanner,' ')) {
+					throw new APException ("Missing number");
+				}
 			}
+			while (rowScanner.hasNext(" ")) {
+				nextChar(rowScanner);
+			}
+
+			num = new BigInteger(naturalNumber(rowScanner));
+			System.out.println(num);
+			System.out.println("check");
+
+			result.add(num);
+
+			System.out.println("check");
 
 			ignoreInput(rowScanner, SPACE);
 
 		}
-		System.out.println(setValue((T)result));
+		//System.out.println(setValue((T)result));
 
 		//log("row" + setValue((T)result));
 		LOG_LEVEL --;
@@ -458,21 +462,27 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		LOG_LEVEL ++;
 
 		StringBuffer num = new StringBuffer();
+
 		while (numberScanner.hasNext()) {
-			ignoreInput(numberScanner, SPACE);
-			
-			if (nextCharIsDigit(numberScanner) && !nextCharIs(numberScanner, '0')) {
-				num.append(nextChar(numberScanner));
-			} else {
-				throw new APException ("number cannot start with '0'");
+			while (numberScanner.hasNext(" ")) {
+				nextChar(numberScanner);
 			}
-			
-			while (nextCharIsDigit(numberScanner)) {
+
+			// 2. Check next digits
+			if (nextCharIsDigit(numberScanner)) {
 				num.append(nextChar(numberScanner));
+				if (num.charAt(0) == '0' && num.length() >= 2) {
+					throw new APException ("number cannot start with '0'");
+				}
+				continue;
 			} 
-			
-			ignoreInput(numberScanner, SPACE);
-			
+
+			// 1. Check first digit
+
+			while (numberScanner.hasNext(" ")) {
+				nextChar(numberScanner);
+			}
+
 			if (nextCharIs(numberScanner, ',') || nextCharIs(numberScanner, '}') ) {
 				break;
 			} else throw new APException("Invalid number in Set. Set can only consist of natural numbers");
@@ -481,7 +491,6 @@ public class Interpreter<T extends SetInterface<BigInteger>> implements Interpre
 		log("Number:" + num.toString());
 		LOG_LEVEL --;
 		log("done number");
-
 		return num.toString();
 	}
 

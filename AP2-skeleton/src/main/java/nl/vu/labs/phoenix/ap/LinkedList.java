@@ -57,9 +57,9 @@ public class LinkedList<E extends Comparable<E>> implements ListInterface<E> {
 
 		if (this.isEmpty()) {
 			insertEmpty(newNode);
-		} else if (newNode.data.compareTo(first.data) <= 0) {
+		} else if (newNode.data.compareTo(first.data) < 0) {
 			insertFirst(newNode);
-		} else if (last.data.compareTo(newNode.data) <= 0) {
+		} else if (newNode.data.compareTo(last.data) > 0) {
 			insertLast(newNode);
 		} else {
 			insertMiddle (newNode);
@@ -157,19 +157,19 @@ public class LinkedList<E extends Comparable<E>> implements ListInterface<E> {
 			if (current.data.compareTo(d) == 0) {
 				return true;
 			}
-			/*if (current.data.compareTo(d) < 0) {
+			if (current.data.compareTo(d) < 0) {
 				continue;
 			} else {
 				current = current.prior;
 				break;
-			}*/
+			}
 		} 
 
-		goToFirst();	
+		/*goToFirst();	
 		while(current.data.compareTo(d) < 0) {
 			goToNext();
 		}
-		current  = current.prior;
+		current  = current.prior;*/
 		return false;
 	}
 

@@ -6,6 +6,16 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 public class PosixEvaluation {
+
+	static int LOG_LEVEL = 0;
+	static void log(String msg) {
+		String tab = "";
+		for(int i = 0; i < LOG_LEVEL ; i ++) {
+			tab += "  ";
+		}
+		System.out.println(tab + msg);
+	}
+
 	/**
 	 * Creates the postfix representation as string from the given term.
 	 * @param s the term string in infix notation
@@ -179,75 +189,59 @@ public class PosixEvaluation {
 
 
 
-	public static String createPostfixSet(String s) throws Exception
-	{
+	public static String createPostfixSet(String s) throws Exception {
 		Stack<Character> stack = new Stack<Character>();
 		StringBuffer resStr = new StringBuffer();
 
 		char c;
 		int strpos = 0;
-		while (strpos < s.length())
-		{
+		while (strpos < s.length()) {
 			// get the current character
 			c = s.charAt(strpos);
-			if (c == ')')
-			{
-				while (!stack.empty() && !stack.peek().equals('('))
-				{
+			if (c == ')') {
+				while (!stack.empty() && !stack.peek().equals('(')) {
 					resStr.append(stack.pop());
 				}
 				if (!stack.empty())
 					stack.pop();
 			}
-			else if (c == '+')
-			{
+			else if (c == '+') {
 				if (!stack.empty() && (stack.peek().equals('+') || stack.peek().equals('-') ||
-						stack.peek().equals('*') || stack.peek().equals('/')))
-				{
+						stack.peek().equals('*') || stack.peek().equals('/'))) {
 					resStr.append(stack.pop());
 				}
 				stack.push(c);
 			}
-			else if (c == '-')
-			{
+			else if (c == '-') {
 				if (!stack.empty() && (stack.peek().equals('+') || stack.peek().equals('-') ||
-						stack.peek().equals('*') || stack.peek().equals('/')))
-				{
+						stack.peek().equals('*') || stack.peek().equals('/'))) {
 					resStr.append(stack.pop());
 				}
 				stack.push(c);
 			}
-			else if (c == '*')
-			{
-				if (!stack.empty() && (stack.peek().equals('*') || stack.peek().equals('/')))
-				{
+			else if (c == '*') {
+				if (!stack.empty() && (stack.peek().equals('*') || stack.peek().equals('/'))) {
 					resStr.append(stack.pop());
 				}
 				stack.push(c);
 			}
-			else if (c == '/')
-			{
-				if (!stack.empty() && (stack.peek().equals('*') || stack.peek().equals('/')))
-				{
+			else if (c == '/') {
+				if (!stack.empty() && (stack.peek().equals('*') || stack.peek().equals('/'))) {
 					resStr.append(stack.pop());
 				}
 				stack.push(c);
 			}
-			else if (c == '(')
-			{
+			else if (c == '(') {
 				// just skip open bracket
 				stack.push(c);
 			}
-			else if (c == '{')
-			{
+			else if (c == '{') {
 				// process numericals
-				while ( c != '}' )
-				{
+				while ( c != '}' ) {
 					resStr.append(c);
 					if (strpos+1 < s.length())
 						c = s.charAt(++strpos);
-					else
-					{
+					else {
 						// abort while loop if we reach end of string
 						c = 0;
 						strpos = s.length();
@@ -257,8 +251,7 @@ public class PosixEvaluation {
 				resStr.append(c);
 				if (strpos+1 < s.length())
 					c = s.charAt(++strpos);
-				else
-				{
+				else {
 					// abort while loop if we reach end of string
 					c = 0;
 					strpos = s.length();
@@ -267,8 +260,7 @@ public class PosixEvaluation {
 				// inside while loop strpos is incremented one time too often
 				strpos--;
 			}
-			else
-			{
+			else {
 				throw new Exception("Invalid symbol: " + c + '!');
 			}
 			// make a right step inside the string
@@ -277,8 +269,7 @@ public class PosixEvaluation {
 			resStr.append(" ");
 		}
 
-		while (!stack.empty())
-		{
+		while (!stack.empty()) {
 			resStr.append(stack.pop());
 			resStr.append(" ");
 		}
@@ -293,59 +284,55 @@ public class PosixEvaluation {
 		int strpos = 0;
 		char c;
 		SetInterface<BigInteger> x = null;
-		while (strpos < s.length())
-		{
+		while (strpos < s.length()) {
 			// get the current character
 			c = s.charAt(strpos);
 			//x = 0;
-			if (c == '+')
-			{
+			if (c == '+') {
 				SetInterface<BigInteger> x1 = stack.pop();
 				SetInterface<BigInteger> x2 = stack.pop();
 				x = x2.union(x1);
 				stack.push(x);
 			}
-			else if (c == '-')
-			{
+			else if (c == '-') {
 				SetInterface<BigInteger> x1 = stack.pop();
 				SetInterface<BigInteger> x2 = stack.pop();
 				x = x2.difference(x1);
 				stack.push(x);
 			}
-			else if (c == '*')
-			{
+			else if (c == '*') {
 				SetInterface<BigInteger> x1 = stack.pop();
 				SetInterface<BigInteger> x2 = stack.pop();
 				x = x2.intersection(x1);
 				stack.push(x);
 			}
-			else if (c == '|')
-			{
+			else if (c == '|') {
 				SetInterface<BigInteger> x1 = stack.pop();
 				SetInterface<BigInteger> x2 = stack.pop();
 				x = x2.symdiff(x1);
 				stack.push(x);
 			}
 			else if (c == '{') {
-					// process numericals
-					// substring with the number at the beginning of the string
-					String sub = s.substring(strpos);
-					int i;
-					// find end of current number in the string
-					for (i = 0; i < sub.length(); i++)
-						if (sub.charAt(i) == ' ')
-							sub = sub.substring(0, i);
+				// process numericals
+				// substring with the number at the beginning of the string
+				String sub = s.substring(strpos);
+				int i;
+				// find end of current number in the string
+				for (i = 0; i < sub.length(); i++)
+					if (sub.charAt(i) == ' ')
+						sub = sub.substring(0, i);
 
-					// 'sub' contains now just the number
-					try {
-						x = stringToSet(sub);
-					} catch (NumberFormatException ex) {
-						throw new Exception("String to number parsing exception: " + s);
-					}
-					stack.push(x);
-					// go on with next token
-					strpos += i-1;
-				
+				// 'sub' contains now just the number
+				x = stringToSet(sub);
+				/*try {
+					x = stringToSet(sub);
+				} catch (NumberFormatException ex) {
+					throw new Exception("String to number parsing exception: " + s);
+				}*/
+				stack.push(x);
+				// go on with next token
+				strpos += i-1;
+
 			}
 			// ignore other symbols and proceed
 			strpos++;
@@ -356,37 +343,80 @@ public class PosixEvaluation {
 	public static SetInterface<BigInteger> stringToSet (String s) throws Exception {
 		SetInterface<BigInteger> result = new Set<BigInteger>();
 		Scanner in = new Scanner (s).useDelimiter("");
-		StringBuffer bigInt;
 
-		while (in.hasNext()) {
-			if (nextCharIs(in,'{')) {
+
+		if (nextCharIs(in,'{')) {
+			nextChar(in);
+		}
+		
+		while (!nextCharIs(in,'}')) {
+		
+			while (in.hasNext(" ")) {
 				nextChar(in);
 			}
+			
+			if (nextCharIs(in, ',')) {
+				nextChar(in);
+				if(nextCharIs(in,' ')) {
+					throw new APException ("Missing number");
+				}
+			}
+			
+			while (in.hasNext(" ")) {
+				nextChar(in);
+			}
+			
+			BigInteger num  = new BigInteger(naturalNumber(in));
+			
+			result.add(num);
 
 			while (in.hasNext(" ")) {
 				nextChar(in);
 			}
+		}
 
-			bigInt = new StringBuffer();
-			while (nextCharIsDigit(in)) {
-				bigInt.append(nextChar(in));
-			} 
+		if (nextCharIs(in,'}')) {
+			nextChar(in);
+		}
+		
+		System.out.println(setValue(result));
+		
+		return result;
+	}
 
-			if (nextCharIs(in, ',')) {
-				result.add(new BigInteger(bigInt.toString()));
-				nextChar(in);
-				if (nextCharIs(in, ',')) {
-					throw new Exception ("Missing number");
+	public static String naturalNumber (Scanner numberScanner) throws APException {
+		log("number");
+		LOG_LEVEL ++;
+
+		StringBuffer num = new StringBuffer();
+
+		while (numberScanner.hasNext()) {
+			while (numberScanner.hasNext(" ")) {
+				nextChar(numberScanner);
+			}
+
+			// 2. Check next digits
+			if (nextCharIsDigit(numberScanner)) {
+				num.append(nextChar(numberScanner));
+				if (num.charAt(0) == '0' && num.length() >= 2) {
+					throw new APException ("number cannot start with '0'");
 				}
 				continue;
 			} 
-
-			if (nextCharIs(in,'}')) {
-				nextChar(in);
+			
+			while (numberScanner.hasNext(" ")) {
+				nextChar(numberScanner);
 			}
+
+			if (nextCharIs(numberScanner, ',') || nextCharIs(numberScanner, '}') ) {
+				break;
+			} else throw new APException("Invalid number in Set. Set can only consist of natural numbers");
 		}
 
-		return result;
+		log("Number:" + num.toString());
+		LOG_LEVEL --;
+		log("done number");
+		return num.toString();
 	}
 
 	public static String setValue (SetInterface<BigInteger> set) {
@@ -395,16 +425,15 @@ public class PosixEvaluation {
 		if (set.isEmpty()) {
 			result.append('{');
 			result.append('}');
-		}else {
+		} else {
 			result.append('{');
 			result.append(set.get());
 			set.remove(set.get());
 			while(!set.isEmpty()){
-				result.append(" ");
+				result.append(", ");
 				result.append(set.get());
 				set.remove(set.get());
 			}
-
 			result.append('}');
 		}
 		return result.toString();
@@ -440,5 +469,4 @@ public class PosixEvaluation {
 		}
 
 	}
-
 }
