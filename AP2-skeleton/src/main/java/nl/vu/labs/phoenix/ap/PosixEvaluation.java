@@ -293,6 +293,7 @@ public class PosixEvaluation {
 				SetInterface<BigInteger> x2 = stack.pop();
 				x = x2.union(x1);
 				stack.push(x);
+				System.out.println(setValue(x1));
 			}
 			else if (c == '-') {
 				SetInterface<BigInteger> x1 = stack.pop();
@@ -323,12 +324,15 @@ public class PosixEvaluation {
 						sub = sub.substring(0, i);
 
 				// 'sub' contains now just the number
-				x = stringToSet(sub);
-				/*try {
+
+				try {
 					x = stringToSet(sub);
+					//System.out.println(setValue(x));
 				} catch (NumberFormatException ex) {
 					throw new Exception("String to number parsing exception: " + s);
-				}*/
+				}
+				stack.push(x);
+				System.out.println(setValue(stack.pop()));
 				stack.push(x);
 				// go on with next token
 				strpos += i-1;
@@ -379,7 +383,7 @@ public class PosixEvaluation {
 			nextChar(in);
 		}
 		
-		System.out.println(setValue(result));
+	//	System.out.println(setValue(result));
 		
 		return result;
 	}
@@ -461,7 +465,7 @@ public class PosixEvaluation {
 			String postfix = createPostfixSet(ex);
 			System.out.println(postfix);
 			String result = evaluatePostfixSet(postfix);
-			System.out.println(result);
+			//System.out.println(result);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
