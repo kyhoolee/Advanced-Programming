@@ -67,6 +67,14 @@ public class Set<T extends Comparable<T>> implements SetInterface<T> {
 	public SetInterface<T> union(SetInterface<T> set) {
 		SetInterface<T> result = set.copy();
 
+		if (set.isEmpty()) {
+			return result;
+		}
+
+		if (this.isEmpty()) {
+			return set.copy();
+		}
+
 		this.set.goToFirst();
 		if (!result.containsElement(this.set.retrieve())){
 			result.add(this.set.retrieve());
@@ -84,6 +92,10 @@ public class Set<T extends Comparable<T>> implements SetInterface<T> {
 	public SetInterface<T> intersection(SetInterface<T> set) {
 		SetInterface<T> result = new Set<T>();
 
+		if (this.isEmpty() || set.isEmpty()) {
+			return result;
+		}
+
 		this.set.goToFirst();
 		if (set.containsElement(this.set.retrieve())){
 			result.add(this.set.retrieve());
@@ -99,16 +111,20 @@ public class Set<T extends Comparable<T>> implements SetInterface<T> {
 
 	@Override
 	public SetInterface<T> difference(SetInterface<T> set) {
-		SetInterface<T> result = new Set<T>();
+		SetInterface<T> result =  this.copy();
+		
+		if (this.isEmpty() || set.isEmpty()) {
+            return result;
+        }
 
 		this.set.goToFirst();
-		if (!set.containsElement(this.set.retrieve())){
-			result.add(this.set.retrieve());
+		if (set.containsElement(this.set.retrieve())){
+			result.remove(this.set.retrieve());
 		}
 
 		while (this.set.goToNext()) {
-			if (!result.containsElement(this.set.retrieve())){
-				result.add(this.set.retrieve());
+			if (set.containsElement(this.set.retrieve())){
+				result.remove(this.set.retrieve());
 			}
 		} 
 		return result;

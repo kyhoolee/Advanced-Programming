@@ -23,7 +23,7 @@ public class Main {
 			result.append(set.get());
 			set.remove(set.get());
 			while(!set.isEmpty()){
-				result.append(" ");
+				result.append(", ");
 				result.append(set.get());
 				set.remove(set.get());
 			}
